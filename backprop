@@ -1,0 +1,13 @@
+NB. Translation of Matt Mazur's walk through tutorial on back propagation into 10 lines of J code
+NB. https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+
+lr      =:0.5[er=:0[log=:1['`sig der dot'=:([:%@>:@^-)`(*1&-)`(+/.*)
+ins     =: 2 4 $ 0[out=:2 4 $ 0 [ ws =: 2 2 2 $0.15 0.20 0.25 0.30 0.40 0.45 0.50 0.55[bs=:0.35 0.60 NB. ws =: ? 2 2 2 $ 0
+ins     =: 0.05 0.1 (0 0;1 0)}ins[ins=:0.05 0.1 (0 1;1 1)}ins[out=:0.05 0.1 (0 0;1 0)}out NB. i1 =: 0.05 ] i2 =: 0.10
+out     =: 0.01 0.99 (0 3;1 3)}out NB. o1 =: 0.01 ] o2 =: 0.99
+fprop   =: ( 3 : 'out=:v((0,y);(1,y))}out[ins=:v((0,>:y);(1,>:y))}ins[v=:(sig"0 +/"2 ((<:y){bs),(y{|:ins)*|:(<:y){ws)' )
+bpe     =: ( 3 : '(y{|:1{ws)-lr*xd*xi*(1-xi)*(1{|:out)' ) [ bps=:( 3 : '(y{|:0{ws)-lr*0{|:ins*(sig 1{y{out)*+/(y{1{ws)*sxd' )
+bprop   =: ( 3 : 'nws=:(|:bps"0 [i.2),:(|:bpe"0 [i.2)[sxd=:xd*sig"0 xi[xd=:(-1*xo-xi)[xo=:(3{|:out)[xi=:(3{|:ins)' )
+calcerr =: ( 3 : 'er=:+/(0.5*^&2)"0 -/"1 (|:3{|:out),.(3{|:ins)' )
+epoch   =: ( 3 : 'ws=:nws[log=:log,er[bprop@calcerr@fprop"0(1+i.2)' )
+plot log [ load'plot' [ epoch"0 i.500
